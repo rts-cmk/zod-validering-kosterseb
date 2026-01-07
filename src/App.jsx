@@ -112,7 +112,7 @@ function App() {
         <Field label="Password" name="password" type="password" value={formData.password} onChange={handleChange} error={errors.password} />
         <Field label="Gentag Password" name="gentagPassword" type="password" value={formData.gentagPassword} onChange={handleChange} error={errors.gentagPassword} />
 
-        <button type="submit" style={{ padding: '10px', cursor: 'pointer', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '4px' }}>
+        <button type="submit" style={{ padding: '10px', cursor: 'pointer', backgroundColor: '#002bff', color: 'white', border: 'none', borderRadius: '4px' }}>
           Registrer
         </button>
       </form>
