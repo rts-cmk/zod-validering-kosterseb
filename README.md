@@ -1,16 +1,16 @@
 # Dokumentation: Formularvalidering med React & Zod
 
-Denne opgave demonstrerer implementeringen af en moderne registreringsformular med fokus på typesikkerhed, live-validering og kompleks forretningslogik.
+Denne opgave demonstrerer implementeringen af en moderne registreringsformular med fokus på typesikkerhed, live-validering og kompleks logik.
 
 ## Overordnet Teori
 
 ### 1. React State Management
-Projektet benytter Reacts `useState` hook til at håndtere formulardata som et samlet objekt. Dette gør det nemt at tracke ændringer i realtid:
+Projektet benytter Reacts `useState` hook til at håndtere formulardata som et samlet objekt. Dette gør det nemt at tracke ændringer in-realtime:
 * **Single Source of Truth:** Alle inputfelter læser fra og skriver til den samme state.
 * **Live Feedback:** Ved at validere i `onChange`-handleren får brugeren øjeblikkelig feedback, hvilket forbedrer UX (User Experience).
 
 ### 2. Schema-baseret Validering med Zod
-I stedet for at skrive manuelle `if/else` erklæringer for hvert felt, bruger vi **Zod**. Zod er et "TypeScript-first" schema-deklarationsbibliotek.
+I stedet for at skrive manuelle `if/else` erklæringer for hvert felt, bruger vi **Zod**. Zod er et "TypeScript-first" schema-deklarationsbibliotek. Men bruger det med JavaScript i dette tilfælde, men betyder bare at du kan bruge det på mange måder.
 
 **Fordele ved Zod i dette projekt:**
 * **Deklarativ kode:** Vi definerer *reglerne* (schemaet) ét sted, uafhængigt af selve UI-komponenten.
@@ -27,7 +27,7 @@ Formularen implementerer flere niveauer af kontrol:
     * *Alderscheck:* En beregning baseret på den nuværende dato (`new Date()`) mod den indtastede fødselsdato for at sikre, at brugeren er +18 år.
 
 ### 4. UI/UX Strategi
-For at holde koden vedligeholdelsesvenlig er formularen opdelt:
+For at holde koden SOC (Seperation of concern) er formularen opdelt:
 * **Hjælpekomponenter:** En `Field`-komponent genbruges til alle inputfelter for at sikre ensartet styling og fejlhåndtering.
 * **Betinget Rendering:** Når valideringen er succesfuld, skifter interfacet til en "Success"-side, der viser de opsamlede data (eksklusiv følsomme oplysninger som passwords).
 
