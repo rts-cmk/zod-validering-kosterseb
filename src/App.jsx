@@ -68,7 +68,7 @@ function App() {
     const { name, value } = e.target;
     const newData = { ...formData, [name]: value };
     setFormData(newData);
-    validate(newData); // Opdaterer fejl "live"
+    validate(newData);
   };
 
   const handleSubmit = (e) => {
