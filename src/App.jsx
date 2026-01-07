@@ -1,21 +1,27 @@
 import { useState } from 'react';
 import { z } from 'zod';
 
-// --- ZOD SCHEMA ---
+// ZOD SCHEMA
 const BrugerSchema = z.object({
   fornavn: z.string().min(1, "Fornavn er påkrævet"),
+
   efternavn: z.string().min(1, "Efternavn er påkrævet"),
+
   brugernavn: z.string()
     .regex(/^[a-zA-Z0-9_]+$/, "Kun bogstaver, tal og underscore")
     .min(3, "Mindst 3 tegn"),
+
   email: z.string().email("Indtast en gyldig e-mail"),
+
   password: z.string()
     .min(8, "Mindst 8 tegn")
     .regex(/[A-Z]/, "Skal indeholde mindst ét stort bogstav")
     .regex(/[a-z]/, "Skal indeholde mindst ét lille bogstav")
     .regex(/[0-9]/, "Skal indeholde mindst ét tal")
     .regex(/[!@#$%^&*]/, "Skal indeholde mindst ét specialtegn (!@#$%^&*)"),
+
   gentagPassword: z.string(),
+
   fodselsdato: z.string().refine((dato) => {
     const idag = new Date();
     const fodselsdag = new Date(dato);
@@ -26,21 +32,23 @@ const BrugerSchema = z.object({
     }
     return alder >= 18;
   }, "Du skal være mindst 18 år gammel"),
+
   telefon: z.string().regex(/^[0-9]{8}$/, "Skal være 8 cifre").optional().or(z.literal('')),
+
   postnummer: z.string().regex(/^[0-9]{4}$/, "Skal være præcis 4 cifre")
 })
-.refine((data) => data.password === data.gentagPassword, {
-  message: "Passwords er ikke ens",
-  path: ["gentagPassword"], 
-});
+  .refine((data) => data.password === data.gentagPassword, {
+    message: "Passwords er ikke ens",
+    path: ["gentagPassword"],
+  });
 
-// --- COMPONENT ---
+// COMPONENT
 function App() {
   const [formData, setFormData] = useState({
     fornavn: '', efternavn: '', brugernavn: '', email: '',
     password: '', gentagPassword: '', fodselsdato: '', telefon: '', postnummer: ''
   });
-  
+
   const [errors, setErrors] = useState({});
   const [submittedData, setSubmittedData] = useState(null);
 
@@ -66,7 +74,7 @@ function App() {
   const handleSubmit = (e) => {
     e.preventDefault();
     const validData = validate(formData);
-    
+
     if (validData) {
       setSubmittedData(validData);
     }
@@ -91,9 +99,9 @@ function App() {
   return (
     <div style={{ padding: '20px', fontFamily: 'sans-serif', maxWidth: '400px' }}>
       <h1>Zod demo - Profil Oprettelse</h1>
-      
+
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-        
+
         <Field label="Fornavn" name="fornavn" type="text" value={formData.fornavn} onChange={handleChange} error={errors.fornavn} />
         <Field label="Efternavn" name="efternavn" type="text" value={formData.efternavn} onChange={handleChange} error={errors.efternavn} />
         <Field label="Brugernavn" name="brugernavn" type="text" value={formData.brugernavn} onChange={handleChange} error={errors.brugernavn} />
