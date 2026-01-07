@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { pass } from 'three/tsl';
 import { z } from 'zod';
 
 const BrugerSchema = z.object({
