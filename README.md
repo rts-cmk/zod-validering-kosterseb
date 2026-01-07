@@ -1,91 +1,49 @@
-# Zod‑validering
+# Dokumentation: Formularvalidering med React & Zod
 
-I denne opgave skal du opsætte en moderne React‑applikation med Vite og implementere formvalidering ved hjælp af Zod. Du skal bygge en registreringsformular, hvor brugerens input valideres både i UI’et og i JavaScript‑logikken.
+Denne opgave demonstrerer implementeringen af en moderne registreringsformular med fokus på typesikkerhed, live-validering og kompleks logik.
 
----
+## Overordnet Teori
 
-## 1. Projektopsætning
-- Opret et nyt projekt med **Vite** og **React**
-- Installer **Zod**
-- Opret en komponent `RegistrationForm.jsx` hvor al formular‑ og valideringslogik ligger
+### 1. React State Management
+Projektet benytter Reacts `useState` hook til at håndtere formulardata som et samlet objekt. Dette gør det nemt at tracke ændringer in-realtime:
+* **Single Source of Truth:** Alle inputfelter læser fra og skriver til den samme state.
+* **Live Feedback:** Ved at validere i `onChange`-handleren får brugeren øjeblikkelig feedback, hvilket forbedrer UX (User Experience).
 
----
+### 2. Schema-baseret Validering med Zod
+I stedet for at skrive manuelle `if/else` erklæringer for hvert felt, bruger vi **Zod**. Zod er et "TypeScript-first" schema-deklarationsbibliotek. Men bruger det med JavaScript i dette tilfælde, men betyder bare at du kan bruge det på mange måder.
 
-## 2. Formularfelter
-Din formular skal som minimum indeholde følgende felter:
+**Fordele ved Zod i dette projekt:**
+* **Deklarativ kode:** Vi definerer *reglerne* (schemaet) ét sted, uafhængigt af selve UI-komponenten.
+* **Avanceret logik:** Zod håndterer komplekse mønstre som Regex (til passwords) og betinget validering.
+* **Parsing:** Vi bruger `.safeParse()`, som returnerer et struktureret objekt med enten data eller formaterede fejlbeskeder.
 
-- Fornavn (tekst)
-- Efternavn (tekst)
-- Email (skal være gyldig email)
-- Password (se krav nedenfor)
-- Gentag password (skal matche password)
-- Fødselsdato (bruges til alderscheck)
-- Telefonnummer (valgfrit, men skal valideres hvis udfyldt)
+### 3. Valideringslogik
+Formularen implementerer flere niveauer af kontrol:
 
-Du må gerne tilføje flere felter.
+* **Primitiv validering:** Tjek af streng-længde og e-mail format via indbyggede Zod-metoder.
+* **Regex (Regular Expressions):** Anvendes til password-styrke (store bogstaver, tal, specialtegn) samt dansk telefonnummer-format (8 cifre).
+* **Refinements (.refine):** Bruges til logik, der afhænger af flere felter eller eksterne beregninger:
+    * *Password match:* Sammenligning af `password` og `gentagPassword`.
+    * *Alderscheck:* En beregning baseret på den nuværende dato (`new Date()`) mod den indtastede fødselsdato for at sikre, at brugeren er +18 år.
 
----
-
-## 3. Valideringskrav (Zod)
-
-### Password‑krav
-Password skal:
-- være mindst 8 tegn  
-- indeholde mindst ét stort bogstav  
-- indeholde mindst ét lille bogstav  
-- indeholde mindst ét tal  
-- indeholde mindst ét specialtegn (!@#$%^&*)
-
-`Gentag password` skal matche det første password.
+### 4. UI/UX Strategi
+For at holde koden SOC (Seperation of concern) er formularen opdelt:
+* **Hjælpekomponenter:** En `Field`-komponent genbruges til alle inputfelter for at sikre ensartet styling og fejlhåndtering.
+* **Betinget Rendering:** Når valideringen er succesfuld, skifter interfacet til en "Success"-side, der viser de opsamlede data (eksklusiv følsomme oplysninger som passwords).
 
 ---
 
-### Alderskrav
-Brugeren skal være **mindst 18 år**.
-
-Du skal:
-- Validere datoen med Zod
-- Udregne alder ud fra fødselsdatoen
-- Returnere en fejl, hvis brugeren er under 18
+## Teknologier
+- **React (Vite):** Frontend framework.
+- **Zod:** Schema validering.
+- **JavaScript (JSX):** Programmeringssprog.
 
 ---
 
-### Email
-- Skal være en gyldig emailadresse (`z.string().email()`)
+## Teknisk Fordybelse
 
----
+### Valideringsstrategi: safeParse
+Vi har valgt at benytte `.safeParse` frem for den almindelige `.parse`. Dette er gjort for at opnå en "non-throwing" validerings-flow. Da React-komponenter gen-rendrer ofte, sikrer `safeParse`, at vi kan håndtere valideringsfejl som almindelig data-state frem for runtime-exceptions.
 
-### Telefonnummer
-- Feltet er valgfrit
-- Hvis det er udfyldt, skal det matche et dansk nummerformat (8 cifre)
-
----
-
-### Andre krav (vælg mindst 2)
-Vælg mindst to af følgende ekstra valideringer:
-
-- Brugernavn: kun bogstaver, tal og underscore
-- Adresse: minimum 5 tegn
-- Postnummer: præcis 4 cifre
-- Land: skal være et af en liste (fx Danmark, Sverige, Norge)
-- Nyhedsbrev: kræver email, hvis checkbox er slået til
-- Profilbeskrivelse: max 200 tegn
-
----
-
-## 4. Fejlhåndtering i UI
-- Fejlbeskeder skal vises under hvert felt
-- Fejl skal opdateres live, når brugeren skriver
-- Når formularen er gyldig, skal du vise en “Tak for din registrering”-besked med de indtastede data (undtagen password)
-
----
-
-## 5. Bonus (frivilligt)
-Hvis du vil udfordre dig selv, kan du tilføje:
-
-- Debounce på validering
-- Et progress‑bar der viser password‑styrke
-- Zod‑refinement til komplekse regler
-- Async validering (fx tjek om brugernavn er “optaget”)
-  - Hvilke valideringer du har implementeret
-  - Eventuelle ekstra features
+### Kompleks Logik med Refinement
+For at overholde kravet om aldersvalidering og password-matching, benyttes `.refine()`. Dette tillader os at injicere custom JavaScript-logik i valideringskæden, hvilket gør det muligt at validere på tværs af flere felter (cross-field validation) – en opgave der typisk er svær i standard HTML5 validering.
