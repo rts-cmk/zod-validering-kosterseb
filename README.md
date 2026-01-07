@@ -1,16 +1,49 @@
-# React + Vite
+# Dokumentation: Formularvalidering med React & Zod
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Denne opgave demonstrerer implementeringen af en moderne registreringsformular med fokus på typesikkerhed, live-validering og kompleks forretningslogik.
 
-Currently, two official plugins are available:
+## Overordnet Teori
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### 1. React State Management
+Projektet benytter Reacts `useState` hook til at håndtere formulardata som et samlet objekt. Dette gør det nemt at tracke ændringer i realtid:
+* **Single Source of Truth:** Alle inputfelter læser fra og skriver til den samme state.
+* **Live Feedback:** Ved at validere i `onChange`-handleren får brugeren øjeblikkelig feedback, hvilket forbedrer UX (User Experience).
 
-## React Compiler
+### 2. Schema-baseret Validering med Zod
+I stedet for at skrive manuelle `if/else` erklæringer for hvert felt, bruger vi **Zod**. Zod er et "TypeScript-first" schema-deklarationsbibliotek.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+**Fordele ved Zod i dette projekt:**
+* **Deklarativ kode:** Vi definerer *reglerne* (schemaet) ét sted, uafhængigt af selve UI-komponenten.
+* **Avanceret logik:** Zod håndterer komplekse mønstre som Regex (til passwords) og betinget validering.
+* **Parsing:** Vi bruger `.safeParse()`, som returnerer et struktureret objekt med enten data eller formaterede fejlbeskeder.
 
-## Expanding the ESLint configuration
+### 3. Valideringslogik
+Formularen implementerer flere niveauer af kontrol:
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+* **Primitiv validering:** Tjek af streng-længde og e-mail format via indbyggede Zod-metoder.
+* **Regex (Regular Expressions):** Anvendes til password-styrke (store bogstaver, tal, specialtegn) samt dansk telefonnummer-format (8 cifre).
+* **Refinements (.refine):** Bruges til logik, der afhænger af flere felter eller eksterne beregninger:
+    * *Password match:* Sammenligning af `password` og `gentagPassword`.
+    * *Alderscheck:* En beregning baseret på den nuværende dato (`new Date()`) mod den indtastede fødselsdato for at sikre, at brugeren er +18 år.
+
+### 4. UI/UX Strategi
+For at holde koden vedligeholdelsesvenlig er formularen opdelt:
+* **Hjælpekomponenter:** En `Field`-komponent genbruges til alle inputfelter for at sikre ensartet styling og fejlhåndtering.
+* **Betinget Rendering:** Når valideringen er succesfuld, skifter interfacet til en "Success"-side, der viser de opsamlede data (eksklusiv følsomme oplysninger som passwords).
+
+---
+
+## Teknologier
+- **React (Vite):** Frontend framework.
+- **Zod:** Schema validering.
+- **JavaScript (JSX):** Programmeringssprog.
+
+---
+
+## Teknisk Fordybelse
+
+### Valideringsstrategi: safeParse
+Vi har valgt at benytte `.safeParse` frem for den almindelige `.parse`. Dette er gjort for at opnå en "non-throwing" validerings-flow. Da React-komponenter gen-rendrer ofte, sikrer `safeParse`, at vi kan håndtere valideringsfejl som almindelig data-state frem for runtime-exceptions.
+
+### Kompleks Logik med Refinement
+For at overholde kravet om aldersvalidering og password-matching, benyttes `.refine()`. Dette tillader os at injicere custom JavaScript-logik i valideringskæden, hvilket gør det muligt at validere på tværs af flere felter (cross-field validation) – en opgave der typisk er svær i standard HTML5 validering.
